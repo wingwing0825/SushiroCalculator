@@ -418,7 +418,6 @@
       <div class="grid">
         <section class="card">
           <h2>全單模式</h2>
-          <div class="sub">適合你只想快速計全枱總數，不處理逐人分單。</div>
 
           <div class="divider"></div>
 
@@ -563,11 +562,7 @@
           </div>
 
           <div class="small-note">
-            規則：<br>
-            1. 每人計自己食的碟。<br>
-            2. 每人可加入自己食的拉麵 / 甜品 / 飲品 / 其他項目。<br>
-            3. 每人自己的小計再計加一。<br>
-            4. 下方會同時顯示全體未計加一、全體加一、全體總額。
+
           </div>
 
           <div class="divider"></div>
@@ -938,13 +933,15 @@
       };
     }
 
-    function updatePersonName(id, value){
-      const person = state.split.people.find(p => p.id === id);
-      if(!person) return;
-      person.name = value;
-      renderSplit();
-    }
+function updatePersonNameDraft(id, value){
+  const person = state.split.people.find(p => p.id === id);
+  if(!person) return;
+  person.name = value;
+}
 
+function commitSplitRender(){
+  renderSplit();
+}
     function changePersonPlate(id, type, delta){
       const person = state.split.people.find(p => p.id === id);
       if(!person) return;
@@ -1025,15 +1022,13 @@
       renderSplit();
     }
 
-    function updatePersonItemName(personId, itemId, value){
-      const person = state.split.people.find(p => p.id === personId);
-      if(!person) return;
-      const item = person.items.find(x => x.id === itemId);
-      if(!item) return;
-      item.name = value;
-      renderSplit();
-    }
-
+function updatePersonItemNameDraft(personId, itemId, value){
+  const person = state.split.people.find(p => p.id === personId);
+  if(!person) return;
+  const item = person.items.find(x => x.id === itemId);
+  if(!item) return;
+  item.name = value;
+}
     function updatePersonItemPrice(personId, itemId, value){
       const person = state.split.people.find(p => p.id === personId);
       if(!person) return;
@@ -1116,7 +1111,13 @@
             <div class="row">
               <div class="field">
                 <label>名稱</label>
-                <input type="text" value="${escapeAttr(person.name)}" oninput="updatePersonName('${person.id}', this.value)">
+                <input
+  type="text"
+  value="${escapeAttr(person.name)}"
+  oninput="updatePersonNameDraft('${person.id}', this.value)"
+  onblur="commitSplitRender()"
+  onchange="commitSplitRender()"
+>
               </div>
             </div>
 
@@ -1181,7 +1182,13 @@
                   <div class="row">
                     <div class="field">
                       <label>名稱</label>
-                      <input type="text" value="${escapeAttr(item.name)}" oninput="updatePersonItemName('${person.id}','${item.id}', this.value)">
+                      <input
+  type="text"
+  value="${escapeAttr(item.name)}"
+  oninput="updatePersonItemNameDraft('${person.id}','${item.id}', this.value)"
+  onblur="commitSplitRender()"
+  onchange="commitSplitRender()"
+>
                     </div>
                     <div class="field sm">
                       <label>單價</label>
