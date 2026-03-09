@@ -1,0 +1,1249 @@
+<!doctype html>
+<html lang="zh-HK">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>壽司郎計數 App</title>
+  <style>
+    :root{
+      --bg1:#fff8fb;
+      --bg2:#f5fbff;
+      --card:#ffffffdd;
+      --ink:#2c2c35;
+      --muted:#747480;
+      --line:#ece2ef;
+      --shadow:0 14px 34px rgba(34,20,40,.10);
+      --accent:#ff77ad;
+      --accent2:#7dcfff;
+      --good:#1f9d6a;
+      --danger:#d9534f;
+      --pill:#ffe8f2;
+      --pill2:#e9f7ff;
+      --btn:#2d2d36;
+      --btnText:#fff;
+      --inputBg:#fff;
+      --radius:22px;
+      --red:#ff6b7f;
+      --silver:#d8dce4;
+      --gold:#ffc65c;
+      --black:#45454f;
+      font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Noto Sans TC","PingFang HK",sans-serif;
+    }
+
+    *{ box-sizing:border-box; }
+    body{
+      margin:0;
+      color:var(--ink);
+      background:
+        radial-gradient(circle at top left, #fff 0%, #fff7fb 30%, transparent 55%),
+        linear-gradient(135deg,var(--bg1),var(--bg2));
+      min-height:100vh;
+    }
+
+    .wrap{
+      max-width:1180px;
+      margin:0 auto;
+      padding:20px 14px 42px;
+    }
+
+    .hero{
+      background:linear-gradient(135deg,#ffffffee,#fff7fcdd);
+      border:1px solid #f1deea;
+      border-radius:30px;
+      box-shadow:var(--shadow);
+      padding:20px 18px;
+      margin-bottom:16px;
+    }
+    .hero h1{
+      margin:0 0 6px;
+      font-size:clamp(1.45rem,2vw,2rem);
+    }
+    .hero p{
+      margin:0;
+      color:var(--muted);
+      line-height:1.6;
+    }
+
+    .tabs{
+      display:flex;
+      gap:10px;
+      margin-bottom:16px;
+      flex-wrap:wrap;
+    }
+    .tab-btn{
+      border:none;
+      cursor:pointer;
+      border-radius:999px;
+      padding:12px 18px;
+      font-weight:800;
+      font-size:1rem;
+      background:#fff;
+      border:1px solid var(--line);
+      color:var(--ink);
+      box-shadow:var(--shadow);
+    }
+    .tab-btn.active{
+      background:linear-gradient(135deg,#ff77ad,#ff95bf);
+      color:#fff;
+      border-color:transparent;
+    }
+
+    .page{ display:none; }
+    .page.active{ display:block; }
+
+    .grid{
+      display:grid;
+      grid-template-columns:1.08fr .92fr;
+      gap:16px;
+    }
+    @media (max-width: 920px){
+      .grid{ grid-template-columns:1fr; }
+    }
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--line);
+      border-radius:26px;
+      box-shadow:var(--shadow);
+      padding:16px;
+      backdrop-filter: blur(10px);
+    }
+    .card h2{
+      margin:0 0 12px;
+      font-size:1.08rem;
+    }
+    .sub{
+      color:var(--muted);
+      font-size:.94rem;
+      margin-top:-4px;
+      margin-bottom:12px;
+      line-height:1.6;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:12px;
+    }
+    .chip{
+      background:var(--pill);
+      color:#8c3a67;
+      border:1px solid #ffd3e5;
+      border-radius:999px;
+      padding:6px 10px;
+      font-size:.88rem;
+      font-weight:700;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.alt{
+      background:var(--pill2);
+      color:#25658e;
+      border-color:#cfeeff;
+    }
+    .chip.active{
+      outline:3px solid rgba(255,119,173,.18);
+      transform:translateY(-1px);
+    }
+
+    .plate-grid{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:12px;
+    }
+    @media (max-width: 640px){
+      .plate-grid{ grid-template-columns:1fr; }
+    }
+
+    .plate-box{
+      border:1px solid var(--line);
+      border-radius:20px;
+      padding:12px;
+      background:#fff;
+    }
+    .plate-head{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:10px;
+    }
+    .dot{
+      width:18px;
+      height:18px;
+      border-radius:999px;
+      border:2px solid rgba(0,0,0,.08);
+      flex:0 0 auto;
+    }
+    .dot.red{ background:var(--red); }
+    .dot.silver{ background:var(--silver); }
+    .dot.gold{ background:var(--gold); }
+    .dot.black{ background:var(--black); }
+
+    .row{
+      display:flex;
+      gap:10px;
+      align-items:end;
+      margin:8px 0;
+      flex-wrap:wrap;
+    }
+    .row > *{ min-width:0; }
+
+    label{
+      font-size:.92rem;
+      color:var(--muted);
+      font-weight:600;
+      display:block;
+      margin-bottom:6px;
+    }
+    input, select, button{
+      font:inherit;
+    }
+    input[type="number"], input[type="text"], select{
+      width:100%;
+      border:1px solid #e6dce9;
+      background:var(--inputBg);
+      border-radius:14px;
+      padding:11px 12px;
+      outline:none;
+      color:var(--ink);
+    }
+    input:focus, select:focus{
+      border-color:#ffb8d1;
+      box-shadow:0 0 0 4px rgba(255,119,173,.13);
+    }
+
+    .field{ flex:1 1 160px; }
+    .field.sm{ flex:0 1 140px; }
+    .field.xs{ flex:0 1 110px; }
+
+    .stepper{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      justify-content:space-between;
+    }
+    .stepper button, .mini-btn, .btn{
+      border:none;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+    .stepper button{
+      width:42px;
+      height:42px;
+      border-radius:12px;
+      background:#f7f3f8;
+      color:var(--ink);
+      font-size:1.15rem;
+      font-weight:800;
+    }
+    .stepper button:hover,
+    .mini-btn:hover,
+    .btn:hover{
+      transform:translateY(-1px);
+    }
+    .qty-box{
+      min-width:54px;
+      text-align:center;
+      font-weight:800;
+      font-size:1.05rem;
+    }
+
+    .btn{
+      background:var(--btn);
+      color:var(--btnText);
+      padding:11px 14px;
+      border-radius:14px;
+      font-weight:800;
+    }
+    .btn.secondary{
+      background:#f3f6fb;
+      color:#243443;
+      border:1px solid #dde7f2;
+    }
+    .btn.pink{
+      background:linear-gradient(135deg,#ff77ad,#ff95bf);
+      color:#fff;
+    }
+    .btn.blue{
+      background:linear-gradient(135deg,#67c8ff,#7fd7ff);
+      color:#143548;
+    }
+    .btn.red{
+      background:linear-gradient(135deg,#ff7a7a,#ff9b9b);
+      color:#fff;
+    }
+
+    .other-list, .people-list, .person-food-list{
+      display:grid;
+      gap:10px;
+    }
+    .other-item, .person-card, .food-item{
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:12px;
+      background:#fff;
+    }
+    .other-top, .person-top, .food-top{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:8px;
+      flex-wrap:wrap;
+    }
+    .title{
+      font-weight:800;
+    }
+    .meta{
+      color:var(--muted);
+      font-size:.9rem;
+    }
+
+    .mini-btn{
+      padding:8px 10px;
+      border-radius:12px;
+      background:#f7f3f8;
+      color:var(--ink);
+      font-weight:700;
+    }
+    .mini-btn.danger{
+      background:#fff0f0;
+      color:#b43f3f;
+    }
+
+    .summary{
+      display:grid;
+      gap:10px;
+    }
+    .sum-box{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:18px;
+      padding:14px;
+    }
+    .sum-label{
+      color:var(--muted);
+      font-size:.92rem;
+      margin-bottom:6px;
+    }
+    .sum-value{
+      font-size:1.5rem;
+      font-weight:900;
+    }
+    .sum-value.sm{ font-size:1.08rem; }
+    .good{ color:var(--good); }
+    .danger{ color:var(--danger); }
+
+    .divider{
+      height:1px;
+      background:linear-gradient(90deg,transparent,#eadff0,transparent);
+      margin:14px 0;
+    }
+
+    .person-plates{
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:10px;
+    }
+    @media (max-width: 640px){
+      .person-plates{ grid-template-columns:1fr; }
+    }
+
+    .small-note{
+      color:var(--muted);
+      font-size:.88rem;
+      line-height:1.7;
+    }
+
+    .sticky-summary{
+      position:sticky;
+      top:14px;
+    }
+    @media (max-width:920px){
+      .sticky-summary{ position:static; }
+    }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-size:.84rem;
+      color:#6b6470;
+      background:#f8f5fa;
+      border:1px solid #ede4f0;
+      padding:6px 10px;
+      border-radius:999px;
+    }
+
+    .price-badge{
+      display:inline-flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:6px;
+    }
+    .price-pill{
+      background:#fff;
+      border:1px solid var(--line);
+      border-radius:999px;
+      padding:7px 11px;
+      font-weight:700;
+      font-size:.9rem;
+    }
+
+    .section-title{
+      margin:0 0 10px;
+      font-size:1rem;
+      font-weight:900;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>🍣 壽司郎計數 App</h1>
+      
+      <div class="price-badge">
+
+      </div>
+    </section>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="tabFullBtn" type="button" onclick="switchTab('full')">全單模式</button>
+      <button class="tab-btn" id="tabSplitBtn" type="button" onclick="switchTab('split')">分單模式</button>
+    </div>
+
+    <!-- 全單模式 -->
+    <section class="page active" id="pageFull">
+      <div class="grid">
+        <section class="card">
+          <h2>全單模式</h2>
+          <div class="sub">適合你只想快速計全枱總數，不處理逐人分單。</div>
+
+          <div class="divider"></div>
+
+          <h2>碟數</h2>
+          <div class="plate-grid">
+            <div class="plate-box">
+              <div class="plate-head">
+                <span class="dot red"></span>
+                <strong>紅碟</strong>
+              </div>
+              <div class="meta">HK$12 </div>
+              <div class="stepper">
+                <button type="button" onclick="changeFullPlateQty('red', -1)">−</button>
+                <div class="qty-box" id="fullQtyRed">0</div>
+                <button type="button" onclick="changeFullPlateQty('red', 1)">＋</button>
+              </div>
+            </div>
+
+            <div class="plate-box">
+              <div class="plate-head">
+                <span class="dot silver"></span>
+                <strong>銀碟</strong>
+              </div>
+              <div class="meta">HK$17 </div>
+              <div class="stepper">
+                <button type="button" onclick="changeFullPlateQty('silver', -1)">−</button>
+                <div class="qty-box" id="fullQtySilver">0</div>
+                <button type="button" onclick="changeFullPlateQty('silver', 1)">＋</button>
+              </div>
+            </div>
+
+            <div class="plate-box">
+              <div class="plate-head">
+                <span class="dot gold"></span>
+                <strong>金碟</strong>
+              </div>
+              <div class="meta">HK$22 </div>
+              <div class="stepper">
+                <button type="button" onclick="changeFullPlateQty('gold', -1)">−</button>
+                <div class="qty-box" id="fullQtyGold">0</div>
+                <button type="button" onclick="changeFullPlateQty('gold', 1)">＋</button>
+              </div>
+            </div>
+
+            <div class="plate-box">
+              <div class="plate-head">
+                <span class="dot black"></span>
+                <strong>黑碟</strong>
+              </div>
+              <div class="meta">HK$27 </div>
+              <div class="stepper">
+                <button type="button" onclick="changeFullPlateQty('black', -1)">−</button>
+                <div class="qty-box" id="fullQtyBlack">0</div>
+                <button type="button" onclick="changeFullPlateQty('black', 1)">＋</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <h2>其他食品</h2>
+          <div class="sub">先揀分類，再揀常見項目；下面只會顯示該分類項目。</div>
+
+          <div class="chips" id="fullCategoryChips"></div>
+
+          <div class="row">
+            <div class="field">
+              <label>快速加入常見項目</label>
+              <select id="fullPresetSelect"></select>
+            </div>
+            <div class="field xs">
+              <button class="btn blue" type="button" onclick="addFullPresetItem()">加入</button>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>自訂項目名稱</label>
+              <input type="text" id="fullCustomName" placeholder="例如：限定拉麵 / 特價甜品">
+            </div>
+            <div class="field sm">
+              <label>單價 (HK$)</label>
+              <input type="number" id="fullCustomPrice" min="0" step="1" placeholder="0">
+            </div>
+            <div class="field xs">
+              <button class="btn pink" type="button" onclick="addFullCustomItem()">新增</button>
+            </div>
+          </div>
+
+          <div class="other-list" id="fullOtherList"></div>
+
+          <div class="divider"></div>
+
+          <button class="btn secondary" type="button" onclick="resetFullMode()">重設全單模式</button>
+        </section>
+
+        <aside class="sticky-summary">
+          <div class="card">
+            <h2>全單總計</h2>
+            <div class="summary">
+              <div class="sum-box">
+                <div class="sum-label">碟總額</div>
+                <div class="sum-value" id="fullPlatesSubtotal">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">其他食品總額</div>
+                <div class="sum-value" id="fullOthersSubtotal">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">未計加一</div>
+                <div class="sum-value" id="fullSubtotal">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">加一服務費</div>
+                <div class="sum-value sm" id="fullService">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">埋單總數</div>
+                <div class="sum-value good" id="fullGrandTotal">$0</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- 分單模式 -->
+    <section class="page" id="pageSplit">
+      <div class="grid">
+        <section class="card">
+          <h2>分單模式</h2>
+          <div class="sub">每個人可獨立加入碟與其他食品，最後自動計個人總數與全體總數。</div>
+
+          <div class="row">
+            <div class="field sm">
+              <label>人數</label>
+              <input type="number" id="splitPeopleCount" min="1" step="1" value="2">
+            </div>
+            <div class="field xs">
+              <button class="btn" type="button" onclick="buildSplitPeople()">建立</button>
+            </div>
+          </div>
+
+          <div class="small-note">
+            規則：<br>
+            1. 每人計自己食的碟。<br>
+            2. 每人可加入自己食的拉麵 / 甜品 / 飲品 / 其他項目。<br>
+            3. 每人自己的小計再計加一。<br>
+            4. 下方會同時顯示全體未計加一、全體加一、全體總額。
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="people-list" id="splitPeopleList"></div>
+
+          <div class="divider"></div>
+
+          <button class="btn secondary" type="button" onclick="resetSplitMode()">重設分單模式</button>
+        </section>
+
+        <aside class="sticky-summary">
+          <div class="card">
+            <h2>分單模式總覽</h2>
+            <div class="summary">
+              <div class="sum-box">
+                <div class="sum-label">全體碟總額</div>
+                <div class="sum-value" id="splitPlatesSubtotal">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">全體其他食品總額</div>
+                <div class="sum-value" id="splitOthersSubtotal">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">全體未計加一</div>
+                <div class="sum-value" id="splitSubtotal">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">全體加一服務費</div>
+                <div class="sum-value sm" id="splitService">$0</div>
+              </div>
+              <div class="sum-box">
+                <div class="sum-label">全體埋單總數</div>
+                <div class="sum-value good" id="splitGrandTotal">$0</div>
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const PRICES = {
+      red: 12,
+      silver: 17,
+      gold: 22,
+      black: 27
+    };
+
+    const CATEGORIES = [
+      { key: "麵 / 湯", cls: "" },
+      { key: "副餐", cls: "alt" },
+      { key: "甜品", cls: "" },
+      { key: "飲品", cls: "alt" }
+    ];
+
+    const PRESET_ITEMS = [
+  // 麵 / 湯
+  { name: "蜆肉海苔麵豉湯", price: 20, category: "麵 / 湯" },
+  { name: "腐皮烏冬", price: 27, category: "麵 / 湯" },
+  { name: "釜玉烏冬", price: 28, category: "麵 / 湯" },
+  { name: "炸蝦天婦羅烏冬", price: 28, category: "麵 / 湯" },
+  { name: "豚骨拉麵", price: 32, category: "麵 / 湯" },
+  { name: "辣豚骨拉麵", price: 32, category: "麵 / 湯" },
+  { name: "鯛魚湯蜆肉拉麵", price: 33, category: "麵 / 湯" },
+  { name: "牛肉烏冬", price: 33, category: "麵 / 湯" },
+
+  // 副餐 / 刺身
+  { name: "青唐辛子燒椒醬", price: 3, category: "副餐" },
+  { name: "黃金脆薯", price: 13, category: "副餐" },
+  { name: "南瓜天婦羅", price: 13, category: "副餐" },
+  { name: "炸蝦天婦羅拼盤(半份)", price: 18, category: "副餐" },
+  { name: "炸蝦天婦羅", price: 18, category: "副餐" },
+  { name: "炸雞軟骨", price: 19, category: "副餐" },
+  { name: "茶碗蒸", price: 19, category: "副餐" },
+  { name: "脆脆炸雞塊", price: 22, category: "副餐" },
+  { name: "炸蝦天婦羅拼盤", price: 28, category: "副餐" },
+
+  { name: "生三文魚刺身盛", price: 39, category: "副餐" },
+  { name: "赤蝦刺身", price: 39, category: "副餐" },
+  { name: "極上刺身盛合", price: 75, category: "副餐" },
+
+  // 以下兩項你張圖價格位被截走，我先用 0 佔位
+  { name: "生三文魚腩刺身", price: 48, category: "副餐" },
+  { name: "生三文魚腩刺身・寒鰤魚腩刺身", price: 48, category: "副餐" },
+
+  // 甜品
+  { name: "蜜瓜味雪葩", price: 13, category: "甜品" },
+  { name: "冷凍芒果", price: 13, category: "甜品" },
+  { name: "黃豆粉蕨餅", price: 13, category: "甜品" },
+  { name: "牛奶味軟雪糕(有曲奇)", price: 18, category: "甜品" },
+  { name: "牛奶味軟雪糕", price: 18, category: "甜品" },
+  { name: "壽司郎經典布甸", price: 22, category: "甜品" },
+  { name: "卡達拉娜", price: 22, category: "甜品" },
+  { name: "千層蛋糕", price: 22, category: "甜品" },
+  { name: "白桃蒙布朗蛋糕", price: 22, category: "甜品" },
+  { name: "黃豆粉蕨餅芭菲", price: 27, category: "甜品" },
+  { name: "朱古力香莓芭菲", price: 27, category: "甜品" },
+
+  // 飲品
+  { name: "百事可樂", price: 8, category: "飲品" },
+  { name: "百事可樂(無糖)", price: 8, category: "飲品" },
+  { name: "美年達橙汁", price: 8, category: "飲品" },
+  { name: "七喜", price: 8, category: "飲品" },
+  { name: "維他氣泡檸檬茶", price: 8, category: "飲品" },
+  { name: "100%蘋果汁", price: 8, category: "飲品" },
+  { name: "纖解茶", price: 9, category: "飲品" },
+
+  // 酒類 / 酒精飲品
+  { name: "菊正宗", price: 17, category: "飲品" },
+  { name: "Horoyoi(葡萄味)", price: 19, category: "飲品" },
+  { name: "Horoyoi(柚子鹽味)", price: 19, category: "飲品" },
+  { name: "三得利頂級啤酒", price: 24, category: "飲品" },
+  { name: "梅酒(含梅子)", price: 27, category: "飲品" },
+  { name: "威士忌梳打", price: 27, category: "飲品" },
+  { name: "菊正宗(大吟釀)", price: 59, category: "飲品" }
+];
+
+    const state = {
+      activeTab: "full",
+
+      full: {
+        activeCategory: "麵 / 湯",
+        plateQty: { red:0, silver:0, gold:0, black:0 },
+        items: []
+      },
+
+      split: {
+        people: [],
+        peopleCount: 2
+      }
+    };
+
+    function money(n){
+      return "$" + Number(n || 0).toFixed(1).replace(/\.0$/, "");
+    }
+
+    function uid(){
+      return Math.random().toString(36).slice(2) + Date.now().toString(36);
+    }
+
+    function escapeHtml(str){
+      return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
+    }
+
+    function escapeAttr(str){
+      return escapeHtml(str);
+    }
+
+    function switchTab(tab){
+      state.activeTab = tab;
+      document.getElementById("tabFullBtn").classList.toggle("active", tab === "full");
+      document.getElementById("tabSplitBtn").classList.toggle("active", tab === "split");
+      document.getElementById("pageFull").classList.toggle("active", tab === "full");
+      document.getElementById("pageSplit").classList.toggle("active", tab === "split");
+    }
+
+    // ---------- 全單模式 ----------
+    function changeFullPlateQty(type, delta){
+      state.full.plateQty[type] = Math.max(0, state.full.plateQty[type] + delta);
+      renderFull();
+    }
+
+    function setFullCategory(category){
+      state.full.activeCategory = category;
+      renderFullCategoryChips();
+      renderFullPresetSelect();
+    }
+
+    function renderFullCategoryChips(){
+      const wrap = document.getElementById("fullCategoryChips");
+      wrap.innerHTML = CATEGORIES.map(c => `
+        <button
+          type="button"
+          class="chip ${c.cls} ${state.full.activeCategory === c.key ? 'active' : ''}"
+          onclick="setFullCategory('${c.key}')">${c.key}</button>
+      `).join("");
+    }
+
+    function renderFullPresetSelect(){
+      const sel = document.getElementById("fullPresetSelect");
+      const list = PRESET_ITEMS.filter(i => i.category === state.full.activeCategory);
+      sel.innerHTML =
+        `<option value="">-- 選擇${state.full.activeCategory}項目 --</option>` +
+        list.map((item, idx) => `<option value="${idx}">${item.name}｜${money(item.price)}</option>`).join("");
+    }
+
+    function addFullPresetItem(){
+      const sel = document.getElementById("fullPresetSelect");
+      if(sel.value === "") return;
+      const list = PRESET_ITEMS.filter(i => i.category === state.full.activeCategory);
+      const item = list[Number(sel.value)];
+      state.full.items.push({
+        id: uid(),
+        name: item.name,
+        price: item.price,
+        qty: 1,
+        category: item.category
+      });
+      sel.value = "";
+      renderFull();
+    }
+
+    function addFullCustomItem(){
+      const name = document.getElementById("fullCustomName").value.trim();
+      const price = Number(document.getElementById("fullCustomPrice").value || 0);
+      if(!name) return alert("請輸入項目名稱");
+      if(price < 0) return alert("價錢不可少於 0");
+
+      state.full.items.push({
+        id: uid(),
+        name,
+        price,
+        qty: 1,
+        category: "自訂"
+      });
+
+      document.getElementById("fullCustomName").value = "";
+      document.getElementById("fullCustomPrice").value = "";
+      renderFull();
+    }
+
+    function changeFullItemQty(id, delta){
+      const item = state.full.items.find(x => x.id === id);
+      if(!item) return;
+      item.qty = Math.max(0, item.qty + delta);
+      if(item.qty === 0){
+        state.full.items = state.full.items.filter(x => x.id !== id);
+      }
+      renderFull();
+    }
+
+    function removeFullItem(id){
+      state.full.items = state.full.items.filter(x => x.id !== id);
+      renderFull();
+    }
+
+    function updateFullItemName(id, value){
+      const item = state.full.items.find(x => x.id === id);
+      if(!item) return;
+      item.name = value;
+      renderFull();
+    }
+
+    function updateFullItemPrice(id, value){
+      const item = state.full.items.find(x => x.id === id);
+      if(!item) return;
+      item.price = Math.max(0, Number(value || 0));
+      renderFull();
+    }
+
+    function getFullTotals(){
+      const platesSubtotal =
+        state.full.plateQty.red * PRICES.red +
+        state.full.plateQty.silver * PRICES.silver +
+        state.full.plateQty.gold * PRICES.gold +
+        state.full.plateQty.black * PRICES.black;
+
+      const othersSubtotal = state.full.items.reduce((sum, item) => {
+        return sum + item.price * item.qty;
+      }, 0);
+
+      const subtotal = platesSubtotal + othersSubtotal;
+      const service = subtotal * 0.1;
+      const grandTotal = subtotal + service;
+
+      return { platesSubtotal, othersSubtotal, subtotal, service, grandTotal };
+    }
+
+    function renderFullItems(){
+      const wrap = document.getElementById("fullOtherList");
+      if(!state.full.items.length){
+        wrap.innerHTML = `<div class="small-note">未加入其他食品。</div>`;
+        return;
+      }
+
+      wrap.innerHTML = state.full.items.map(item => `
+        <div class="other-item">
+          <div class="other-top">
+            <div>
+              <div class="title">${escapeHtml(item.name)}</div>
+              <div class="meta">${escapeHtml(item.category)} ・ 小計 ${money(item.price * item.qty)}</div>
+            </div>
+            <button class="mini-btn danger" type="button" onclick="removeFullItem('${item.id}')">刪除</button>
+          </div>
+
+          <div class="row">
+            <div class="field">
+              <label>名稱</label>
+              <input type="text" value="${escapeAttr(item.name)}" oninput="updateFullItemName('${item.id}', this.value)">
+            </div>
+            <div class="field sm">
+              <label>單價</label>
+              <input type="number" min="0" step="1" value="${item.price}" oninput="updateFullItemPrice('${item.id}', this.value)">
+            </div>
+            <div class="field sm">
+              <label>數量</label>
+              <div class="stepper">
+                <button type="button" onclick="changeFullItemQty('${item.id}', -1)">−</button>
+                <div class="qty-box">${item.qty}</div>
+                <button type="button" onclick="changeFullItemQty('${item.id}', 1)">＋</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join("");
+    }
+
+    function renderFullSummary(){
+      const t = getFullTotals();
+      document.getElementById("fullQtyRed").textContent = state.full.plateQty.red;
+      document.getElementById("fullQtySilver").textContent = state.full.plateQty.silver;
+      document.getElementById("fullQtyGold").textContent = state.full.plateQty.gold;
+      document.getElementById("fullQtyBlack").textContent = state.full.plateQty.black;
+
+      document.getElementById("fullPlatesSubtotal").textContent = money(t.platesSubtotal);
+      document.getElementById("fullOthersSubtotal").textContent = money(t.othersSubtotal);
+      document.getElementById("fullSubtotal").textContent = money(t.subtotal);
+      document.getElementById("fullService").textContent = money(t.service);
+      document.getElementById("fullGrandTotal").textContent = money(t.grandTotal);
+    }
+
+    function renderFull(){
+      renderFullCategoryChips();
+      renderFullPresetSelect();
+      renderFullItems();
+      renderFullSummary();
+    }
+
+    function resetFullMode(){
+      if(!confirm("確定要重設全單模式？")) return;
+      state.full = {
+        activeCategory: "麵 / 湯",
+        plateQty: { red:0, silver:0, gold:0, black:0 },
+        items: []
+      };
+      document.getElementById("fullCustomName").value = "";
+      document.getElementById("fullCustomPrice").value = "";
+      renderFull();
+    }
+
+    // ---------- 分單模式 ----------
+    function buildSplitPeople(){
+      const count = Math.max(1, Number(document.getElementById("splitPeopleCount").value || 1));
+      const old = [...state.split.people];
+
+      state.split.people = Array.from({ length: count }, (_, i) => {
+        const prev = old[i];
+        return prev ? prev : createPerson(i + 1);
+      });
+
+      renderSplit();
+    }
+
+    function createPerson(index){
+      return {
+        id: uid(),
+        name: `第${index}位`,
+        activeCategory: "麵 / 湯",
+        plates: { red:0, silver:0, gold:0, black:0 },
+        items: []
+      };
+    }
+
+    function updatePersonName(id, value){
+      const person = state.split.people.find(p => p.id === id);
+      if(!person) return;
+      person.name = value;
+      renderSplit();
+    }
+
+    function changePersonPlate(id, type, delta){
+      const person = state.split.people.find(p => p.id === id);
+      if(!person) return;
+      person.plates[type] = Math.max(0, person.plates[type] + delta);
+      renderSplit();
+    }
+
+    function setPersonCategory(id, category){
+      const person = state.split.people.find(p => p.id === id);
+      if(!person) return;
+      person.activeCategory = category;
+      renderSplit();
+    }
+
+    function addPersonPresetItem(personId){
+      const person = state.split.people.find(p => p.id === personId);
+      if(!person) return;
+
+      const sel = document.getElementById(`personPreset_${personId}`);
+      if(!sel || sel.value === "") return;
+
+      const list = PRESET_ITEMS.filter(i => i.category === person.activeCategory);
+      const item = list[Number(sel.value)];
+
+      person.items.push({
+        id: uid(),
+        name: item.name,
+        price: item.price,
+        qty: 1,
+        category: item.category
+      });
+
+      renderSplit();
+    }
+
+    function addPersonCustomItem(personId){
+      const person = state.split.people.find(p => p.id === personId);
+      if(!person) return;
+
+      const nameInput = document.getElementById(`personCustomName_${personId}`);
+      const priceInput = document.getElementById(`personCustomPrice_${personId}`);
+      const name = nameInput.value.trim();
+      const price = Number(priceInput.value || 0);
+
+      if(!name) return alert("請輸入項目名稱");
+      if(price < 0) return alert("價錢不可少於 0");
+
+      person.items.push({
+        id: uid(),
+        name,
+        price,
+        qty: 1,
+        category: "自訂"
+      });
+
+      nameInput.value = "";
+      priceInput.value = "";
+      renderSplit();
+    }
+
+    function changePersonItemQty(personId, itemId, delta){
+      const person = state.split.people.find(p => p.id === personId);
+      if(!person) return;
+      const item = person.items.find(x => x.id === itemId);
+      if(!item) return;
+
+      item.qty = Math.max(0, item.qty + delta);
+      if(item.qty === 0){
+        person.items = person.items.filter(x => x.id !== itemId);
+      }
+      renderSplit();
+    }
+
+    function removePersonItem(personId, itemId){
+      const person = state.split.people.find(p => p.id === personId);
+      if(!person) return;
+      person.items = person.items.filter(x => x.id !== itemId);
+      renderSplit();
+    }
+
+    function updatePersonItemName(personId, itemId, value){
+      const person = state.split.people.find(p => p.id === personId);
+      if(!person) return;
+      const item = person.items.find(x => x.id === itemId);
+      if(!item) return;
+      item.name = value;
+      renderSplit();
+    }
+
+    function updatePersonItemPrice(personId, itemId, value){
+      const person = state.split.people.find(p => p.id === personId);
+      if(!person) return;
+      const item = person.items.find(x => x.id === itemId);
+      if(!item) return;
+      item.price = Math.max(0, Number(value || 0));
+      renderSplit();
+    }
+
+    function getPersonTotals(person){
+      const plateSubtotal =
+        person.plates.red * PRICES.red +
+        person.plates.silver * PRICES.silver +
+        person.plates.gold * PRICES.gold +
+        person.plates.black * PRICES.black;
+
+      const otherSubtotal = person.items.reduce((sum, item) => sum + item.price * item.qty, 0);
+      const subtotal = plateSubtotal + otherSubtotal;
+      const service = subtotal * 0.1;
+      const grandTotal = subtotal + service;
+
+      return { plateSubtotal, otherSubtotal, subtotal, service, grandTotal };
+    }
+
+    function getSplitTotals(){
+      let platesSubtotal = 0;
+      let othersSubtotal = 0;
+      let subtotal = 0;
+      let service = 0;
+      let grandTotal = 0;
+
+      state.split.people.forEach(person => {
+        const t = getPersonTotals(person);
+        platesSubtotal += t.plateSubtotal;
+        othersSubtotal += t.otherSubtotal;
+        subtotal += t.subtotal;
+        service += t.service;
+        grandTotal += t.grandTotal;
+      });
+
+      return { platesSubtotal, othersSubtotal, subtotal, service, grandTotal };
+    }
+
+    function personPlateBox(personId, type, label, colorClass, qty){
+      return `
+        <div class="plate-box">
+          <div class="plate-head">
+            <span class="dot ${colorClass}"></span>
+            <strong>${label}</strong>
+          </div>
+          <div class="meta">HK$${PRICES[type]} / 隻</div>
+          <div class="stepper">
+            <button type="button" onclick="changePersonPlate('${personId}','${type}',-1)">−</button>
+            <div class="qty-box">${qty}</div>
+            <button type="button" onclick="changePersonPlate('${personId}','${type}',1)">＋</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderSplitPeople(){
+      const wrap = document.getElementById("splitPeopleList");
+
+      if(!state.split.people.length){
+        wrap.innerHTML = `<div class="small-note">未建立名單。</div>`;
+        return;
+      }
+
+      wrap.innerHTML = state.split.people.map((person, idx) => {
+        const totals = getPersonTotals(person);
+        const presets = PRESET_ITEMS.filter(i => i.category === person.activeCategory);
+
+        return `
+          <div class="person-card">
+            <div class="person-top">
+              <div class="title">👤 ${escapeHtml(person.name || `第${idx + 1}位`)}</div>
+              <span class="tag">應付 ${money(totals.grandTotal)}</span>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label>名稱</label>
+                <input type="text" value="${escapeAttr(person.name)}" oninput="updatePersonName('${person.id}', this.value)">
+              </div>
+            </div>
+
+            <div class="section-title">碟數</div>
+            <div class="person-plates">
+              ${personPlateBox(person.id, 'red', '紅碟', 'red', person.plates.red)}
+              ${personPlateBox(person.id, 'silver', '銀碟', 'silver', person.plates.silver)}
+              ${personPlateBox(person.id, 'gold', '金碟', 'gold', person.plates.gold)}
+              ${personPlateBox(person.id, 'black', '黑碟', 'black', person.plates.black)}
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="section-title">其他食品</div>
+            <div class="chips">
+              ${CATEGORIES.map(c => `
+                <button
+                  type="button"
+                  class="chip ${c.cls} ${person.activeCategory === c.key ? 'active' : ''}"
+                  onclick="setPersonCategory('${person.id}','${c.key}')">${c.key}</button>
+              `).join("")}
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label>快速加入常見項目</label>
+                <select id="personPreset_${person.id}">
+                  <option value="">-- 選擇${escapeHtml(person.activeCategory)}項目 --</option>
+                  ${presets.map((item, i) => `<option value="${i}">${escapeHtml(item.name)}｜${money(item.price)}</option>`).join("")}
+                </select>
+              </div>
+              <div class="field xs">
+                <button class="btn blue" type="button" onclick="addPersonPresetItem('${person.id}')">加入</button>
+              </div>
+            </div>
+
+            <div class="row">
+              <div class="field">
+                <label>自訂項目名稱</label>
+                <input type="text" id="personCustomName_${person.id}" placeholder="例如：限定甜品 / 拉麵 / 飲品">
+              </div>
+              <div class="field sm">
+                <label>單價 (HK$)</label>
+                <input type="number" id="personCustomPrice_${person.id}" min="0" step="1" placeholder="0">
+              </div>
+              <div class="field xs">
+                <button class="btn pink" type="button" onclick="addPersonCustomItem('${person.id}')">新增</button>
+              </div>
+            </div>
+
+            <div class="person-food-list">
+              ${person.items.length ? person.items.map(item => `
+                <div class="food-item">
+                  <div class="food-top">
+                    <div>
+                      <div class="title">${escapeHtml(item.name)}</div>
+                      <div class="meta">${escapeHtml(item.category)} ・ 小計 ${money(item.price * item.qty)}</div>
+                    </div>
+                    <button class="mini-btn danger" type="button" onclick="removePersonItem('${person.id}','${item.id}')">刪除</button>
+                  </div>
+
+                  <div class="row">
+                    <div class="field">
+                      <label>名稱</label>
+                      <input type="text" value="${escapeAttr(item.name)}" oninput="updatePersonItemName('${person.id}','${item.id}', this.value)">
+                    </div>
+                    <div class="field sm">
+                      <label>單價</label>
+                      <input type="number" min="0" step="1" value="${item.price}" oninput="updatePersonItemPrice('${person.id}','${item.id}', this.value)">
+                    </div>
+                    <div class="field sm">
+                      <label>數量</label>
+                      <div class="stepper">
+                        <button type="button" onclick="changePersonItemQty('${person.id}','${item.id}',-1)">−</button>
+                        <div class="qty-box">${item.qty}</div>
+                        <button type="button" onclick="changePersonItemQty('${person.id}','${item.id}',1)">＋</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              `).join("") : `<div class="small-note">未加入其他食品。</div>`}
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="small-note">
+              碟額：${money(totals.plateSubtotal)}<br>
+              其他食品：${money(totals.otherSubtotal)}<br>
+              未計加一：${money(totals.subtotal)}<br>
+              加一：${money(totals.service)}<br>
+              <strong>合計：${money(totals.grandTotal)}</strong>
+            </div>
+          </div>
+        `;
+      }).join("");
+    }
+
+    function renderSplitSummary(){
+      const t = getSplitTotals();
+      document.getElementById("splitPlatesSubtotal").textContent = money(t.platesSubtotal);
+      document.getElementById("splitOthersSubtotal").textContent = money(t.othersSubtotal);
+      document.getElementById("splitSubtotal").textContent = money(t.subtotal);
+      document.getElementById("splitService").textContent = money(t.service);
+      document.getElementById("splitGrandTotal").textContent = money(t.grandTotal);
+    }
+
+    function renderSplit(){
+      renderSplitPeople();
+      renderSplitSummary();
+    }
+
+    function resetSplitMode(){
+      if(!confirm("確定要重設分單模式？")) return;
+      document.getElementById("splitPeopleCount").value = 2;
+      state.split.people = [createPerson(1), createPerson(2)];
+      renderSplit();
+    }
+
+    // ---------- 初始化 ----------
+    function init(){
+      renderFull();
+      state.split.people = [createPerson(1), createPerson(2)];
+      renderSplit();
+      switchTab("full");
+    }
+
+    init();
+  </script>
+</body>
+</html>
